@@ -1,0 +1,10 @@
+.venv
+.vscode
+.devcontainer
+__pycache__
+.env
+*.rdb
+readme_images/
+*.db
+tests/
+README.md
