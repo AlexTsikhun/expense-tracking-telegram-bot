@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select, update
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from repositories.base import AbstractRepository
@@ -14,6 +14,7 @@ class SQLAlchemyRepository(AbstractRepository):
         instance = self.model_class(**data)
         self.session.add(instance)
         await self.session.flush()
+        await self.session.refresh(instance)
         return instance
 
     async def retrieve(self, reference):
@@ -41,6 +42,18 @@ class SQLAlchemyRepository(AbstractRepository):
         return result.rowcount
 
     async def list(self, **filters):
-        query = select(self.model_class).filter_by(**filters)
+        query = select(self.model_class)
+        conditions = []
+        for key, value in filters.items():
+            if "__gte" in key:
+                field = getattr(self.model_class, key.split("__gte")[0])
+                conditions.append(field >= value)
+            elif "__lte" in key:
+                field = getattr(self.model_class, key.split("__lte")[0])
+                conditions.append(field <= value)
+            else:
+                query = query.filter_by(**{key: value})
+        if conditions:
+            query = query.where(and_(*conditions))
         result = await self.session.execute(query)
         return result.scalars().all()

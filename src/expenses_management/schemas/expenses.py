@@ -1,23 +1,29 @@
 from pydantic import BaseModel
 
 
-class ExpenseCreateSchema(BaseModel):
-    title: str
-    amount_uah: float
-    date: str  # "dd.mm.YYYY"
-
-
-class ExpenseUpdateSchema(BaseModel):
+class ExpenseBaseSchema(BaseModel):
     title: str
     amount_uah: float
 
 
-class ExpenseResponseSchema(BaseModel):
+class ExpenseCreateSchema(ExpenseBaseSchema):
+    pass
+
+
+class ExpenseUpdateSchema(ExpenseBaseSchema):
+    title: str
+    amount_uah: float
+
+
+class ExpenseResponseSchema(ExpenseBaseSchema):
     id: int
-    title: str
-    amount_uah: float
     amount_usd: float
-    date: str  # "dd.mm.YYYY"
+    date: str  # ?
 
     class Config:
         orm_mode = True
+
+
+class ExpensesFiltersSchema(BaseModel):
+    start_date: str | None = None
+    end_date: str | None = None
