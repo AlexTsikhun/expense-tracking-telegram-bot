@@ -11,7 +11,8 @@ from bot.use_cases.expense import GenerateExpensesReportUseCase, UpdateExpenseUs
 
 
 async def start_edit_expense(message: Message, state: FSMContext):
-    """Запускає процес редагування витрати, надсилаючи звіт із витратами."""
+    await state.clear()
+
     use_case = GenerateExpensesReportUseCase(api_service, file_service)
     # try:
     filename = await use_case()

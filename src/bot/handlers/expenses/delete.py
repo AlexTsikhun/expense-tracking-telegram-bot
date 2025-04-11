@@ -11,6 +11,8 @@ from bot.use_cases.expense import DeleteExpenseUseCase, GenerateExpensesReportUs
 
 
 async def start_delete_expense(message: Message, state: FSMContext):
+    await state.clear()
+
     use_case = GenerateExpensesReportUseCase(api_service, file_service)
     try:
         filename = await use_case()

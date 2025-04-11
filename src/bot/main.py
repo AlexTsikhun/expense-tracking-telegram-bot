@@ -40,18 +40,25 @@ async def main():
 
     dispatcher.message.register(start_command, Command("start"))
     dispatcher.message.register(start_adding_expense, F.text == "Додати статтю витрат")
+    dispatcher.message.register(start_generating_expense_report, F.text == "Отримати звіт витрат")
+    dispatcher.message.register(start_delete_expense, F.text == "Видалити статтю")
+    dispatcher.message.register(start_edit_expense, F.text == "Відредагувати статтю")
+
     dispatcher.message.register(process_expense_title, ExpenseStates.title)
     dispatcher.message.register(process_expense_date, ExpenseStates.date)
     dispatcher.message.register(process_expense_amount, ExpenseStates.amount)
-    dispatcher.message.register(start_generating_expense_report, F.text == "Отримати звіт витрат")
+
     dispatcher.message.register(process_expense_report_start_date, ExpenseStates.report_start)
     dispatcher.message.register(process_expense_report_end_date, ExpenseStates.report_end)
-    dispatcher.message.register(start_delete_expense, F.text == "Видалити статтю")
+
     dispatcher.message.register(process_delete_expense_id, ExpenseStates.delete_id)
-    dispatcher.message.register(start_edit_expense, F.text == "Відредагувати статтю")
+
     dispatcher.message.register(process_edit_expense_id, ExpenseStates.edit_id)
     dispatcher.message.register(process_edit_expense_title, ExpenseStates.edit_title)
     dispatcher.message.register(process_edit_expense_amount, ExpenseStates.edit_amount)
+
+    # dispatcher.message.register(cancel_action, F.text == "Скасувати")
+    # dispatcher.message.register(lambda message, state: cancel_action(message, state, bot), F.text == "Скасувати")
 
     try:
         await dispatcher.start_polling(bot)

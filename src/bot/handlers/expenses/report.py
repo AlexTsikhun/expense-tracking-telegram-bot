@@ -11,8 +11,10 @@ from bot.use_cases.expense import GetReportUseCase
 
 
 async def start_generating_expense_report(message: Message, state: FSMContext):
-    await state.set_state(ExpenseStates.report_start)
+    await state.clear()
+
     await message.answer("Введіть дату початку (dd.mm.YYYY):")
+    await state.set_state(ExpenseStates.report_start)
 
 
 @validate_input(ExpenseValidator.validate_date)

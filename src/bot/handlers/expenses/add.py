@@ -13,6 +13,8 @@ from bot.use_cases.expense import CreateExpenseUseCase
 
 # Додавання витрат
 async def start_adding_expense(message: Message, state: FSMContext):
+    await state.clear()
+
     await message.answer("Введіть назву статті витрат:\n\nНаприклад: 'Щомісячна сплата за інтернет'")
     await state.set_state(ExpenseStates.title)
 
