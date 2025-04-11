@@ -1,7 +1,7 @@
-import httpx
-from typing import Dict, Any
+from typing import Any, Dict
 
-from config import settings
+import httpx
+
 
 class HttpClient:
     def __init__(self, base_url: str):
@@ -28,7 +28,4 @@ class HttpClient:
         return response.json()
 
     async def close(self):
-        """Закриває клієнта."""
         await self.client.aclose()
-
-http_client = HttpClient(settings.API_URL)

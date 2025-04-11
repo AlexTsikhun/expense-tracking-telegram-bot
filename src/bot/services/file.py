@@ -1,6 +1,8 @@
 import os
+from typing import Any, Dict, List
+
 import pandas as pd
-from typing import List, Dict, Any
+
 
 class FileService:
     @staticmethod
@@ -10,8 +12,7 @@ class FileService:
         return filename
 
     @staticmethod
-    def get_total_amount(data: List[Dict[str, Any]]) -> float:#?
-        print("dataddddddddddddddd",data )
+    def get_total_amount(data: List[Dict[str, Any]]) -> float:  # ?
         return sum(expense["amount_uah"] for expense in data)
 
     @staticmethod

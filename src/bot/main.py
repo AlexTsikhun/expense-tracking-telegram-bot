@@ -6,22 +6,25 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.filters.command import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 
-print(sys.path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from bot.handlers.expense import (
-    process_delete_expense_id,
+
+from bot.handlers.expenses.add import (
+    process_expense_amount,
+    process_expense_date,
+    process_expense_title,
+    start_adding_expense,
+)
+from bot.handlers.expenses.delete import process_delete_expense_id, start_delete_expense
+from bot.handlers.expenses.edit import (
     process_edit_expense_amount,
     process_edit_expense_id,
     process_edit_expense_title,
-    process_expense_amount,
-    process_expense_date,
+    start_edit_expense,
+)
+from bot.handlers.expenses.report import (
     process_expense_report_end_date,
     process_expense_report_start_date,
-    process_expense_title,
-    start_adding_expense,
-    start_delete_expense,
-    start_edit_expense,
     start_generating_expense_report,
 )
 from bot.handlers.menu import start_command

@@ -1,9 +1,8 @@
-from typing import List, Dict, Any
-from config import settings
-from services.http_client import HttpClient
+from typing import Any, Dict, List
+
 
 class APIService:
-    def __init__(self, http_client: HttpClient):
+    def __init__(self, http_client):
         self.http_client = http_client
 
     async def get_expenses(self, start_date: str = None, end_date: str = None) -> List[Dict[str, Any]]:
@@ -22,4 +21,3 @@ class APIService:
     async def update_expense(self, expense_id: int, title: str, amount_uah: float) -> Dict[str, Any]:
         data = {"title": title, "amount_uah": amount_uah}
         return await self.http_client.put(f"/expenses/{expense_id}", data=data)
-    
