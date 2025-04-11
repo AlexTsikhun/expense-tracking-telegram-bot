@@ -55,6 +55,7 @@ class CreateExpenseUseCase(BaseExpenseUseCase):
             "amount_uah": new_expense.amount_uah,
             "amount_usd": new_expense.amount_usd,
             "date": new_expense.date.strftime("%d.%m.%Y"),
+            "message": "Витрату успішно створено",
         }
 
 
@@ -72,11 +73,11 @@ class UpdateExpenseUseCase(BaseExpenseUseCase):
             amount_usd = amount_uah / usd_rate
             updated_data = {"title": expense_data["title"], "amount_uah": amount_uah, "amount_usd": amount_usd}
             await self.uow.expenses.update(expense_id, updated_data)
-            return expense_data
+            return expense_data | {"message": "Витрату успішно оновлено"}
 
 
 class DeleteExpenseUseCase(BaseExpenseUseCase):
-    async def __call__(self, expense_id: int) -> None:
+    async def __call__(self, expense_id: int) -> dict:
         async with self.uow:
             expense = await self.uow.expenses.retrieve(expense_id)
 
@@ -84,3 +85,5 @@ class DeleteExpenseUseCase(BaseExpenseUseCase):
                 raise DoesNotExistError()
 
             await self.uow.expenses.delete(expense_id)
+
+            return {"message": "Витрату успішно видалено"}

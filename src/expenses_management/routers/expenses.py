@@ -35,7 +35,7 @@ async def update_expense(expense_id: int, expense: ExpenseUpdateSchema, uow=Depe
     return await use_case(expense_id, expense.model_dump())
 
 
-@router.delete("/{expense_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{expense_id}",response_model=dict)
 async def delete_expense(expense_id: int, uow=Depends(get_unit_of_work)):
     use_case = DeleteExpenseUseCase(uow)
     return await use_case(expense_id)
