@@ -1,36 +1,52 @@
-from aiogram import types, Bot
+from datetime import datetime
+
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
-from bot.states.expense import ExpenseStates
-from bot.use_cases.expense import CreateExpenseUseCase, GenerateExpensesReportUseCase, GetReportUseCase, DeleteExpenseUseCase, UpdateExpenseUseCase
-from bot.services.api import APIService
-from bot.services.file import FileService
-from bot.handlers.menu import show_main_menu
 from aiogram.types.input_file import FSInputFile
 from aiogram.types.message import Message
 
+from bot.handlers.menu import show_main_menu
+from bot.services.api import APIService
+from bot.services.file import FileService
 from bot.services.http_client import http_client
-
-
+from bot.services.validator import ExpenseValidator, validate_input
+from bot.states.expense import ExpenseStates
+from bot.use_cases.expense import (
+    CreateExpenseUseCase,
+    DeleteExpenseUseCase,
+    GenerateExpensesReportUseCase,
+    GetReportUseCase,
+    UpdateExpenseUseCase,
+)
 
 api_service = APIService(http_client)
 file_service = FileService()
 
+
 # Додавання витрат
-async def add_expense_start(message: types.Message, state: FSMContext):
+async def start_adding_expense(message: Message, state: FSMContext):
     await message.answer("Введіть назву статті витрат:\n\nНаприклад: 'Щомісячна сплата за інтернет'")
     await state.set_state(ExpenseStates.title)
 
-async def process_title(message: types.Message, state: FSMContext):
+
+@validate_input(ExpenseValidator.validate_title)
+async def process_expense_title(message: Message, state: FSMContext):
     await state.update_data(title=message.text)
     await state.set_state(ExpenseStates.date)
-    await message.answer("Введіть дату (dd.mm.YYYY):\n\nНаприклад: '19.03.2025'")
+    await message.answer(
+        f"Введіть дату (dd.mm.YYYY):\n\nНаприклад: '{datetime.now().strftime('%d.%m.%Y')}'"
+    )  # ? make var?
 
-async def process_date(message: types.Message, state: FSMContext):
+
+@validate_input(ExpenseValidator.validate_date)
+async def process_expense_date(message: Message, state: FSMContext):
     await state.update_data(date=message.text)
     await state.set_state(ExpenseStates.amount)
     await message.answer("Введіть суму (UAH):")
 
-async def process_amount(message: types.Message, state: FSMContext, bot: Bot):
+
+@validate_input(ExpenseValidator.validate_amount)
+async def process_expense_amount(message: Message, state: FSMContext, bot: Bot):
     # try:
     amount = float(message.text)
     data = await state.get_data()
@@ -44,17 +60,22 @@ async def process_amount(message: types.Message, state: FSMContext, bot: Bot):
     # except Exception as e:
     #     await message.answer(str(e))
 
+
 # Звіт
-async def report_start(message: types.Message, state: FSMContext):
+async def start_generating_expense_report(message: Message, state: FSMContext):
     await state.set_state(ExpenseStates.report_start)
     await message.answer("Введіть дату початку (dd.mm.YYYY):")
 
-async def process_report_start(message: types.Message, state: FSMContext):
+
+@validate_input(ExpenseValidator.validate_date)
+async def process_expense_report_start_date(message: Message, state: FSMContext):
     await state.update_data(start=message.text)
     await state.set_state(ExpenseStates.report_end)
     await message.answer("Введіть дату кінця (dd.mm.YYYY):")
 
-async def process_report_end(message: types.Message, state: FSMContext, bot: Bot):
+
+@validate_input(ExpenseValidator.validate_date)
+async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):
     # try:
     data = await state.get_data()
     use_case = GetReportUseCase(api_service, file_service)
@@ -85,6 +106,7 @@ async def start_delete_expense(message: Message, state: FSMContext):
         await state.clear()
 
 
+@validate_input(ExpenseValidator.validate_id)
 async def process_delete_expense_id(message: Message, state: FSMContext, bot: Bot):
     try:
         expense_id = int(message.text)
@@ -100,7 +122,6 @@ async def process_delete_expense_id(message: Message, state: FSMContext, bot: Bo
         await state.clear()
 
 
-
 async def start_edit_expense(message: Message, state: FSMContext):
     """Запускає процес редагування витрати, надсилаючи звіт із витратами."""
     use_case = GenerateExpensesReportUseCase(api_service, file_service)
@@ -114,6 +135,8 @@ async def start_edit_expense(message: Message, state: FSMContext):
     #     await message.answer(str(e))
     #     await state.clear()
 
+
+@validate_input(ExpenseValidator.validate_id)
 async def process_edit_expense_id(message: Message, state: FSMContext):
     """Обробляє введений ID і показує поточні дані витрати."""
     # try:
@@ -131,13 +154,21 @@ async def process_edit_expense_id(message: Message, state: FSMContext):
     # except ValueError:
     #     await message.answer("Введіть коректний ID!")
 
+
+@validate_input(ExpenseValidator.validate_title)
 async def process_edit_expense_title(message: Message, state: FSMContext):
     """Зберігає нову назву витрати і запитує суму."""
     await state.update_data(title=message.text)
     await state.set_state(ExpenseStates.edit_amount)
     await message.answer("Введіть нову суму (UAH):")
 
-async def process_edit_expense_amount(message: Message, state: FSMContext, bot: Bot, ):
+
+@validate_input(ExpenseValidator.validate_amount)
+async def process_edit_expense_amount(
+    message: Message,
+    state: FSMContext,
+    bot: Bot,
+):
     """Виконує оновлення витрати з новими даними."""
     # try:
     amount_uah = float(message.text)
