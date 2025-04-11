@@ -1,12 +1,14 @@
-from typing import List, Dict, Any
 from datetime import datetime
+
 from bot.services.api import APIService
 from bot.services.file import FileService
+
 
 class BaseExpenseUseCase:
     def __init__(self, api_service: APIService, file_service: FileService):
         self.api_service = api_service
         self.file_service = file_service
+
 
 class CreateExpenseUseCase(BaseExpenseUseCase):
     async def __call__(self, title: str, amount_uah: float, date: str) -> str:
@@ -20,7 +22,8 @@ class CreateExpenseUseCase(BaseExpenseUseCase):
         # except Exception as e:
         #     raise RuntimeError(f"Помилка при створенні витрати: {str(e)}")
 
-class GetReportUseCase(BaseExpenseUseCase): #?
+
+class GetReportUseCase(BaseExpenseUseCase):  # ?
     async def __call__(self, start_date: str, end_date: str) -> tuple[str, str]:
         try:
             datetime.strptime(start_date, "%d.%m.%Y")
@@ -34,15 +37,17 @@ class GetReportUseCase(BaseExpenseUseCase): #?
         except Exception as e:
             raise RuntimeError(f"Помилка при отриманні звіту: {str(e)}")
 
+
 class DeleteExpenseUseCase(BaseExpenseUseCase):
     async def __call__(self, expense_id: int) -> tuple[str, str]:
         # try:
-            # expenses = self.api_service.get_expenses()
-            # filename = self.file_service.generate_excel_file(expenses)
+        # expenses = self.api_service.get_expenses()
+        # filename = self.file_service.generate_excel_file(expenses)
         result = await self.api_service.delete_expense(expense_id)
         return result["message"]
         # except Exception as e:
         #     raise RuntimeError(f"Помилка при видаленні витрати: {str(e)}")
+
 
 class UpdateExpenseUseCase(BaseExpenseUseCase):
     async def __call__(self, expense_id: int, title: str, amount_uah: float) -> tuple[str, str]:
@@ -53,7 +58,7 @@ class UpdateExpenseUseCase(BaseExpenseUseCase):
             return result["message"]
         except Exception as e:
             raise RuntimeError(f"Помилка при редагуванні витрати: {str(e)}")
-        
+
 
 class GenerateExpensesReportUseCase(BaseExpenseUseCase):
     async def __call__(self) -> str:
@@ -62,5 +67,5 @@ class GenerateExpensesReportUseCase(BaseExpenseUseCase):
             expenses = await self.api_service.get_expenses()
             filename = self.file_service.generate_excel_file(expenses)
             return filename
-        except Exception as e: #?
+        except Exception as e:  # ?
             raise RuntimeError(f"Помилка при генерації звіту: {str(e)}")
