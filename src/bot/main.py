@@ -57,9 +57,6 @@ async def main():
     dispatcher.message.register(process_edit_expense_title, ExpenseStates.edit_title)
     dispatcher.message.register(process_edit_expense_amount, ExpenseStates.edit_amount)
 
-    # dispatcher.message.register(cancel_action, F.text == "Скасувати")
-    # dispatcher.message.register(lambda message, state: cancel_action(message, state, bot), F.text == "Скасувати")
-
     try:
         await dispatcher.start_polling(bot)
     finally:
@@ -68,6 +65,7 @@ async def main():
 
 
 async def shutdown():
+    """ " Shut down http client (use 1 session for all requests in order to reduce time of requests)"""
     await http_client.close()
 
 

@@ -7,7 +7,7 @@ from bot.handlers.menu import show_main_menu
 from bot.services import api_service, file_service
 from bot.services.validator import ExpenseValidator, validate_input
 from bot.states.expense import ExpenseStates
-from bot.use_cases.expense import GetReportUseCase
+from bot.use_cases.expense import RetrieveReportUseCase
 
 
 async def start_generating_expense_report(message: Message, state: FSMContext):
@@ -26,9 +26,8 @@ async def process_expense_report_start_date(message: Message, state: FSMContext)
 
 @validate_input(ExpenseValidator.validate_date)
 async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):
-    # try:
     data = await state.get_data()
-    use_case = GetReportUseCase(api_service, file_service)
+    use_case = RetrieveReportUseCase(api_service, file_service)
     filename, caption = await use_case(data["start"], message.text)
 
     document = FSInputFile(filename, filename=filename)
@@ -37,7 +36,3 @@ async def process_expense_report_end_date(message: Message, state: FSMContext, b
     file_service.cleanup_file(filename)
     await state.clear()
     await show_main_menu(bot, message.chat.id)
-    # except ValueError as e:
-    #     await message.answer(str(e))
-    # except Exception as e:
-    #     await message.answer(str(e))

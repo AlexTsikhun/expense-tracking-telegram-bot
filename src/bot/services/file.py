@@ -12,7 +12,7 @@ class FileService:
         return filename
 
     @staticmethod
-    def get_total_amount(data: list[dict[str, Any]]) -> float:  # ?
+    def get_total_amount(data: list[dict[str, Any]]) -> float:
         return sum(expense["amount_uah"] for expense in data)
 
     @staticmethod
