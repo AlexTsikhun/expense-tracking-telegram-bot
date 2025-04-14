@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from exceptions import DoesNotExistError
 from expenses_management.services.currency import CurrencyService
+from expenses_management.utils import format_date
 from repositories.sqlalchemy.container import SQLAlchemyUnitOfWork
 
 
@@ -14,9 +13,9 @@ class RetrieveExpensesUseCase(BaseExpenseUseCase):
     async def __call__(self, filters: dict) -> list[dict]:
         query_filters = {}
         if filters["start_date"]:
-            query_filters["date__gte"] = datetime.strptime(filters["start_date"], "%d.%m.%Y")
+            query_filters["date__gte"] = filters["start_date"]
         if filters["end_date"]:
-            query_filters["date__lte"] = datetime.strptime(filters["end_date"], "%d.%m.%Y")
+            query_filters["date__lte"] = filters["end_date"]
 
         async with self.uow:
             expenses = await self.uow.expenses.list(**query_filters)
@@ -27,7 +26,7 @@ class RetrieveExpensesUseCase(BaseExpenseUseCase):
                 "title": expense.title,
                 "amount_uah": expense.amount_uah,
                 "amount_usd": expense.amount_usd,
-                "date": expense.date.strftime("%d.%m.%Y"),
+                "date": format_date(expense.date),
             }
             for expense in expenses
         ]
@@ -54,7 +53,7 @@ class CreateExpenseUseCase(BaseExpenseUseCase):
             "title": new_expense.title,
             "amount_uah": new_expense.amount_uah,
             "amount_usd": new_expense.amount_usd,
-            "date": new_expense.date.strftime("%d.%m.%Y"),
+            "date": format_date(new_expense.date),
             "message": "Витрату успішно створено",
         }
 
