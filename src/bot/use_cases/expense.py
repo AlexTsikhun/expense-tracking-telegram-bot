@@ -9,8 +9,8 @@ class BaseExpenseUseCase:
 
 
 class CreateExpenseUseCase(BaseExpenseUseCase):
-    async def __call__(self, title: str, amount_uah: float, date: str) -> str:
-        result = await self.api_service.create_expense(title, amount_uah, date)
+    async def __call__(self, expense_data: dict) -> str:
+        result = await self.api_service.create_expense(expense_data)
         return result["message"]
 
 
@@ -29,8 +29,8 @@ class DeleteExpenseUseCase(BaseExpenseUseCase):
 
 
 class UpdateExpenseUseCase(BaseExpenseUseCase):
-    async def __call__(self, expense_id: int, title: str, amount_uah: float) -> tuple[str, str]:
-        result = await self.api_service.update_expense(expense_id, title, amount_uah)
+    async def __call__(self, expense_id: int, expense_data: dict) -> str:
+        result = await self.api_service.update_expense(expense_id, expense_data)
         return result["message"]
 
 

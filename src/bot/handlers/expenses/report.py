@@ -25,10 +25,12 @@ async def process_expense_report_start_date(message: Message, state: FSMContext)
 
 
 @validate_input(ExpenseValidator.validate_date)
-async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):
+async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):  # ?
     data = await state.get_data()
+    expense_data = data | {"end_date": message.text}
+
     use_case = RetrieveReportUseCase(api_service, file_service)
-    filename, caption = await use_case(data["start"], message.text)
+    filename, caption = await use_case(expense_data["start"], message.text)
 
     document = FSInputFile(filename, filename=filename)
     await message.answer_document(document, caption=caption)

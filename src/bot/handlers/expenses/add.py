@@ -35,8 +35,11 @@ async def process_expense_date(message: Message, state: FSMContext):
 async def process_expense_amount(message: Message, state: FSMContext, bot: Bot):
     amount = float(message.text)
     data = await state.get_data()
+    expense_data = data | {"amount": amount}
+
     use_case = CreateExpenseUseCase(api_service, file_service)
-    result = await use_case(data["title"], amount, data["date"])
+    result = await use_case(expense_data)
+
     await message.answer(result)
     await state.clear()
     await show_main_menu(bot, message.chat.id)

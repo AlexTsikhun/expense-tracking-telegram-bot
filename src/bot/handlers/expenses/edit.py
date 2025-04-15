@@ -27,7 +27,7 @@ async def process_edit_expense_id(message: Message, state: FSMContext):
     expense_id = int(message.text)
     await state.update_data(edit_id=expense_id)
     expenses = await api_service.get_expenses()
-    expense = next((e for e in expenses if e["id"] == expense_id), None)
+    expense = next((expense for expense in expenses if expense["id"] == expense_id), None)
 
     if expense:
         await message.answer(f"Поточні дані: {expense['title']} - {expense['amount_uah']} UAH")
@@ -53,8 +53,12 @@ async def process_edit_expense_amount(
 ):
     amount_uah = float(message.text)
     data = await state.get_data()
+    expense_data = data | {"amount_uah": amount_uah}
+    expense_id = expense_data.pop("edit_id")
+
     use_case = UpdateExpenseUseCase(api_service, file_service)
-    result = await use_case(data["edit_id"], data["title"], amount_uah)
+    result = await use_case(expense_id, expense_data)
+
     await message.answer(result)
     await state.clear()
     await show_main_menu(bot, message.chat.id)
