@@ -2,10 +2,12 @@ from typing import Any
 
 import httpx
 
+from config import settings
+
 
 class HttpClient:
-    def __init__(self, base_url: str):
-        self.client = httpx.AsyncClient(base_url=base_url)
+    def __init__(self):
+        self.client = httpx.AsyncClient(base_url=settings.API_URL)
 
     async def get(self, endpoint: str, params: dict = None) -> dict[str, Any]:
         response = await self.client.get(endpoint, params=params)

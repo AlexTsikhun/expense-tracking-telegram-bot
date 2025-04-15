@@ -11,7 +11,20 @@ services:
       - ./:/app
     command: >
       sh -c "alembic upgrade head &&
-             uvicorn main:application --host 0.0.0.0 --port 8000 --reload"
+      uvicorn main:application --host 0.0.0.0 --port 8000 --reload"
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    command: >
+      sh -c "python src/bot/main.py"
+    depends_on:
+      - app
 
 volumes:
   my_db:
