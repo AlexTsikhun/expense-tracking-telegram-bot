@@ -18,7 +18,7 @@ class ExpenseValidator:
         if len(value) > 100:
             return False, "Назва занадто довга (макс. 100 символів)!"
 
-        if not re.match(r"^[a-zA-Zа-яА-Я0-9\s]+$", value):
+        if not re.match(r"^[а-яА-ЯіІїЇєЄґҐa-zA-Z0-9\s]+$", value):
             return False, "Назва може містити лише букви, цифри та пробіли!"
 
         return True, None
