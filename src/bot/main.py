@@ -46,7 +46,7 @@ async def main():
 
     dispatcher.message.register(process_expense_title, ExpenseStates.title)
     dispatcher.message.register(process_expense_date, ExpenseStates.date)
-    dispatcher.message.register(process_expense_amount, ExpenseStates.amount)
+    dispatcher.message.register(process_expense_amount, ExpenseStates.amount_uah)
 
     dispatcher.message.register(process_expense_report_start_date, ExpenseStates.report_start)
     dispatcher.message.register(process_expense_report_end_date, ExpenseStates.report_end)

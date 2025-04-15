@@ -25,7 +25,7 @@ async def process_expense_report_start_date(message: Message, state: FSMContext)
 
 
 @validate_input(ExpenseValidator.validate_date)
-async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):  # ?
+async def process_expense_report_end_date(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     expense_data = data | {"end_date": message.text}
 

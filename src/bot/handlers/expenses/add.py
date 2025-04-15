@@ -27,15 +27,15 @@ async def process_expense_title(message: Message, state: FSMContext):
 @validate_input(ExpenseValidator.validate_date)
 async def process_expense_date(message: Message, state: FSMContext):
     await state.update_data(date=message.text)
-    await state.set_state(ExpenseStates.amount)
+    await state.set_state(ExpenseStates.amount_uah)
     await message.answer("Введіть суму (UAH):")
 
 
 @validate_input(ExpenseValidator.validate_amount)
 async def process_expense_amount(message: Message, state: FSMContext, bot: Bot):
-    amount = float(message.text)
+    amount_uah = float(message.text)
     data = await state.get_data()
-    expense_data = data | {"amount": amount}
+    expense_data = data | {"amount_uah": amount_uah}
 
     use_case = CreateExpenseUseCase(api_service, file_service)
     result = await use_case(expense_data)

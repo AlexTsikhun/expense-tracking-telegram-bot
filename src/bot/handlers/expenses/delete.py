@@ -2,6 +2,7 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types.input_file import FSInputFile
 from aiogram.types.message import Message
+from httpx import HTTPStatusError
 
 from bot.handlers.menu import show_main_menu
 from bot.services import api_service, file_service
@@ -24,8 +25,13 @@ async def start_delete_expense(message: Message, state: FSMContext):
 @validate_input(ExpenseValidator.validate_id)
 async def process_delete_expense_id(message: Message, state: FSMContext, bot: Bot):
     expense_id = int(message.text)
+
     use_case = DeleteExpenseUseCase(api_service, file_service)
-    result = await use_case(expense_id)
+    try:
+        result = await use_case(expense_id)
+    except HTTPStatusError:
+        result = "Виникла помилка при видаленні витрати. Можливо такої витрати не існує."
+
     await message.answer(result)
     await state.clear()
     await show_main_menu(bot, message.chat.id)
